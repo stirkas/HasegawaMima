@@ -6,7 +6,7 @@
 sudo apt update
 sudo apt install build-essential
 sudo apt install libboost-all-dev
-sudo apt install fftw3
+sudo apt install libfftw3-dev
 sudo apt install snapd
 sudo snap install cmake --classic
 sudo apt update
