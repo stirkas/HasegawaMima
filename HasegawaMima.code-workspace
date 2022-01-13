@@ -6,5 +6,6 @@
    ],
 	"settings": {
       "cmake.sourceDirectory": "${workspaceFolder}/C",
+      "cmake.buildDirectory": "${workspaceFolder}/C/build"
 	}
 }

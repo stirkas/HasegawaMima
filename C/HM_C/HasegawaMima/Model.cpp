@@ -11,11 +11,11 @@
 namespace HM {
 
 //Useful things for the actual advancing logic.
-fftw_plan p1;
-fftw_plan p2;
-fftw_plan p3;
-fftw_plan p4;
-fftw_plan p5;
+fftw_plan phikxFFT;
+fftw_plan phikyFFT;
+fftw_plan zetakxFFT;
+fftw_plan zetakyFFT;
+fftw_plan phiTotFFT;
 bool fftw_init = false;
 std::complex<double> phix[ny][nx]      = {0};
 std::complex<double> phiy[ny][nx]      = {0};
@@ -26,7 +26,7 @@ std::complex<double> zetax[ny][nx]     = {0};
 std::complex<double> zetay[ny][nx]     = {0};
 std::complex<double> zetakx[ny][nx]    = {0};
 std::complex<double> zetaky[ny][nx]    = {0};
-std::complex<double> phikyTemp[ny][nx] = {0};
+std::complex<double> phikyTrue[ny][nx] = {0};
 std::complex<double> phiTot[ny][nx]    = {0};
 std::complex<double> phikTot[ny][nx]   = {0};
 void Advance(std::complex<double> (&phi)[ny][nx]);
@@ -38,7 +38,6 @@ void Initialize()
    {
       xGrid[i]     = i*dx;
       kxGrid[i]    = -M_PI*nx/lx + 2*M_PI*i/lx;
-      //kxAliased[i] = true ? kxGrid[i] : 0;
    }
    for (size_t j = 0; j < ny; ++j)
    {
@@ -95,11 +94,11 @@ void Initialize()
    }
 
    //Load FFT of phi into phik.
-   auto plan = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phi[0]), reinterpret_cast<fftw_complex*>(&phik[0]),
+   auto phiFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phi[0]), reinterpret_cast<fftw_complex*>(&phik[0]),
                                 FFTW_FORWARD, FFTW_ESTIMATE);
 
-   fftw_execute(plan);
-   fftw_destroy_plan(plan);
+   fftw_execute(phiFFT);
+   fftw_destroy_plan(phiFFT);
 
    //Store phi and phik into the time arrays.
    for (size_t j = 0; j < ny; ++j)
@@ -167,11 +166,11 @@ void Run()
             }
    }
 
-   fftw_destroy_plan(p1);
-   fftw_destroy_plan(p2);
-   fftw_destroy_plan(p3);
-   fftw_destroy_plan(p4);
-   fftw_destroy_plan(p5);
+   fftw_destroy_plan(phikxFFT);
+   fftw_destroy_plan(phikyFFT);
+   fftw_destroy_plan(zetakxFFT);
+   fftw_destroy_plan(zetakyFFT);
+   fftw_destroy_plan(phiTotFFT);
    fftw_cleanup();
 
    std::cout << "Finished storing run data." << std::endl;
@@ -187,41 +186,41 @@ void Advance(std::complex<double> (&phik)[ny][nx])
          zetak[j][i]     = -(kxGrid[i]*kxGrid[i] + kyGrid[j]*kyGrid[j])*phik[j][i];
 
          phikx[j][i]     = 1i*kxGrid[i]*phik[j][i]*kxAliased[i]*kyAliased[j];
-         phikyTemp[j][i] = 1i*kyGrid[j]*phik[j][i]; //Need to hold on to this for eqn below.
+         phikyTrue[j][i] = 1i*kyGrid[j]*phik[j][i]; //Need to hold on to this for eqn below.
          zetakx[j][i]    = 1i*kxGrid[i]*zetak[j][i]*kxAliased[i]*kyAliased[j];
          zetaky[j][i]    = 1i*kyGrid[j]*zetak[j][i]*kxAliased[i]*kyAliased[j];
-         phiky[j][i]     = phiky[j][i]*kyAliased[j]*kxAliased[i]*kyAliased[j];
+         phiky[j][i]     = phikyTrue[j][i]*kyAliased[j]*kxAliased[i];
       }
 
    //Fourier transform per pseudo-spectral algorithm.
    if (!fftw_init)
    {
-      p1 = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phikx[0]), reinterpret_cast<fftw_complex*>(&phix[0]),
-                            FFTW_BACKWARD, FFTW_ESTIMATE);
-      p2 = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phiky[0]), reinterpret_cast<fftw_complex*>(&phiy[0]),
-                            FFTW_BACKWARD, FFTW_ESTIMATE);
-      p3 = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&zetakx[0]), reinterpret_cast<fftw_complex*>(&zetax[0]),
-                            FFTW_BACKWARD, FFTW_ESTIMATE);
-      p4 = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&zetaky[0]), reinterpret_cast<fftw_complex*>(&zetay[0]),
-                            FFTW_BACKWARD, FFTW_ESTIMATE);
-      p5 = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phiTot[0]), reinterpret_cast<fftw_complex*>(&phikTot[0]),
-                            FFTW_FORWARD, FFTW_ESTIMATE);
+      phikxFFT  = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phikx[0]),  reinterpret_cast<fftw_complex*>(&phix[0]),
+                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+      phikyFFT  = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phiky[0]),  reinterpret_cast<fftw_complex*>(&phiy[0]),
+                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+      zetakxFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&zetakx[0]), reinterpret_cast<fftw_complex*>(&zetax[0]),
+                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+      zetakyFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&zetaky[0]), reinterpret_cast<fftw_complex*>(&zetay[0]),
+                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+      phiTotFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phiTot[0]), reinterpret_cast<fftw_complex*>(&phikTot[0]),
+                                   FFTW_FORWARD,  FFTW_ESTIMATE);
       fftw_init = true;
    }
-   fftw_execute(p1);
-   fftw_execute(p2);
-   fftw_execute(p3);
-   fftw_execute(p4);
+   fftw_execute(phikxFFT);
+   fftw_execute(phikyFFT);
+   fftw_execute(zetakxFFT);
+   fftw_execute(zetakyFFT);
    
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
          phiTot[j][i] = phix[j][i]*zetay[j][i] - zetax[j][i]*phiy[j][i];
 
-   fftw_execute(p5);
+   fftw_execute(phiTotFFT);
 
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
-         phik[j][i] = kConst[j][i]*phikTot[j][i] - kappa*phikyTemp[j][i];
+         phik[j][i] = kConst[j][i]*phikTot[j][i] - kappa*phikyTrue[j][i];
 }
 
 } //Close namespace

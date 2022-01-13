@@ -17,7 +17,7 @@ dy = ly/ny
 kappa = .1
 
 #Init temporal grid.
-nt = 200000
+nt = 20000
 dt = 2e-1 #May change below in cases as necessary.
 
 #Create initial grids.
