@@ -16,6 +16,8 @@ sudo apt upgrade
 ## Configure and build
 ```
 cd HasegawaMima/C
-cmake .
+mkdir build
+cd build
+cmake ../
 cmake --build . --target install
 ```
