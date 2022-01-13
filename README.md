@@ -3,14 +3,14 @@
 
 ## Setup
 ```
-sudo apt update &&
-sudo apt install build-essential &&
-sudo apt install libboost-all-dev &&
-sudo apt install libfftw3-dev &&
-sudo apt install snapd &&
-sudo snap install cmake --classic &&
-sudo apt update &&
-sudo apt upgrade &&
+sudo apt update                      &&
+sudo apt install -y build-essential  &&
+sudo apt install -y libboost-all-dev &&
+sudo apt install -y libfftw3-dev     &&
+sudo apt install -y snapd            &&
+sudo snap install -y cmake --classic &&
+sudo apt update                      &&
+sudo apt upgrade
 ```
 
 ## Configure and build
