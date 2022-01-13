@@ -95,7 +95,7 @@ void Initialize()
 
    //Load FFT of phi into phik.
    auto phiFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phi[0]), reinterpret_cast<fftw_complex*>(&phik[0]),
-                                FFTW_FORWARD, FFTW_MEASURE);
+                                  FFTW_FORWARD, FFTW_MEASURE);
 
    fftw_execute(phiFFT);
    fftw_destroy_plan(phiFFT);
