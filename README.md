@@ -15,6 +15,7 @@ sudo apt upgrade
 
 ## Configure and build
 ```
+git clone https://github.com/stirkas/HasegawaMima.git
 cd HasegawaMima/C
 mkdir build
 cd build
