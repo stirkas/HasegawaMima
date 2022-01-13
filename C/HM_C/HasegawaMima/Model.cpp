@@ -95,7 +95,7 @@ void Initialize()
 
    //Load FFT of phi into phik.
    auto phiFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phi[0]), reinterpret_cast<fftw_complex*>(&phik[0]),
-                                FFTW_FORWARD, FFTW_ESTIMATE);
+                                FFTW_FORWARD, FFTW_MEASURE);
 
    fftw_execute(phiFFT);
    fftw_destroy_plan(phiFFT);
@@ -196,15 +196,15 @@ void Advance(std::complex<double> (&phik)[ny][nx])
    if (!fftw_init)
    {
       phikxFFT  = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phikx[0]),  reinterpret_cast<fftw_complex*>(&phix[0]),
-                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+                                   FFTW_BACKWARD, FFTW_MEASURE);
       phikyFFT  = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phiky[0]),  reinterpret_cast<fftw_complex*>(&phiy[0]),
-                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+                                   FFTW_BACKWARD, FFTW_MEASURE);
       zetakxFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&zetakx[0]), reinterpret_cast<fftw_complex*>(&zetax[0]),
-                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+                                   FFTW_BACKWARD, FFTW_MEASURE);
       zetakyFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&zetaky[0]), reinterpret_cast<fftw_complex*>(&zetay[0]),
-                                   FFTW_BACKWARD, FFTW_ESTIMATE);
+                                   FFTW_BACKWARD, FFTW_MEASURE);
       phiTotFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phiTot[0]), reinterpret_cast<fftw_complex*>(&phikTot[0]),
-                                   FFTW_FORWARD,  FFTW_ESTIMATE);
+                                   FFTW_FORWARD,  FFTW_MEASURE);
       fftw_init = true;
    }
    fftw_execute(phikxFFT);
