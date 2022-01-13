@@ -8,7 +8,7 @@ sudo apt install -y build-essential  &&
 sudo apt install -y libboost-all-dev &&
 sudo apt install -y libfftw3-dev     &&
 sudo apt install -y snapd            &&
-sudo snap install -y cmake --classic &&
+sudo snap install cmake --classic    &&
 sudo apt update                      &&
 sudo apt upgrade
 ```
