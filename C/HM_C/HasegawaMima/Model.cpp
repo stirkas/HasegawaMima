@@ -106,7 +106,7 @@ void Initialize()
       for (size_t i = 0; i < nx; ++i)
       {
          phit[0][j][i]  = phi[j][i].real();
-         phikt[0][j][i] = sqrt(phik[j][i].real()*phik[j][i].real() + phik[j][i].imag()*phik[j][i].imag());
+         phikt[0][j][i] = std::abs(phik[j][i]);
       }
 
    std::cout << "Data initialization complete." << std::endl;
@@ -163,7 +163,7 @@ void Run()
             for (size_t i = 0; i < nx; ++i)
             {
                phit[t/saveRate][j][i]  = phi[j][i].real();
-               phikt[t/saveRate][j][i] = sqrt(phik[j][i].real()*phik[j][i].real() + phik[j][i].imag()*phik[j][i].imag());
+               phikt[t/saveRate][j][i] = std::abs(phik[j][i]);
             }
    }
 
@@ -172,6 +172,7 @@ void Run()
    fftw_destroy_plan(p3);
    fftw_destroy_plan(p4);
    fftw_destroy_plan(p5);
+   fftw_cleanup();
 
    std::cout << "Finished storing run data." << std::endl;
 }

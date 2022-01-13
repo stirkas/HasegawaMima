@@ -1,4 +1,12 @@
 {
    "python.linting.pylintEnabled": true,
-   "python.linting.enabled": true
+   "python.linting.enabled": true,
+   "[python]": {
+      "editor.insertSpaces": true,
+      "editor.tabSize": 4
+    },
+    "[C++]": {
+      "editor.insertSpaces": true,
+      "editor.tabSize": 3
+    }
 }
