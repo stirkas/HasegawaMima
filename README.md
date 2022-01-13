@@ -17,6 +17,6 @@ sudo apt upgrade
 ```
 git clone https://github.com/stirkas/HasegawaMima.git
 cd HasegawaMima/C
-cmake . -Bbuild
+cmake . -B build
 cmake --build build --target install
 ```
