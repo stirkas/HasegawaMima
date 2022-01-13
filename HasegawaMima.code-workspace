@@ -5,6 +5,6 @@
       }
    ],
 	"settings": {
-      "cmake.sourceDirectory": "${workspaceFolder}/HasegawaMima/C",
+      "cmake.sourceDirectory": "${workspaceFolder}/C",
 	}
 }
