@@ -1,4 +1,4 @@
-set(SUBPROJECT_NAME "HM_C")
+set(SUBPROJECT_NAME "HM")
 message(STATUS "Configuring ${SUBPROJECT_NAME}")
 
 file(GLOB_RECURSE SRC_FILES *.cpp *.c)

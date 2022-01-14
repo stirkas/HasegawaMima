@@ -8,10 +8,10 @@ print("Initializing variables.")
 
 #Init spatial vars.
 lx = 2*np.pi/.15
-nx = 256
+nx = 8
 dx = lx/nx
 ly = 2*np.pi/.15
-ny = 256
+ny = 8
 mx = my = 8
 dy = ly/ny
 kappa = .1

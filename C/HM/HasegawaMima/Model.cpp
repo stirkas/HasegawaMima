@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
+#include <iomanip> //TODO: Remove
 #include <iostream>
 
 #include <fftw3.h>
@@ -18,7 +19,7 @@ fftw_plan phikxFFT;
 fftw_plan phikyFFT;
 fftw_plan zetakxFFT;
 fftw_plan zetakyFFT;
-fftw_plan phiTotFFT;
+fftw_plan advTotFFT;
 std::complex<double> phix[ny][nx]      = {0};
 std::complex<double> phiy[ny][nx]      = {0};
 std::complex<double> phikx[ny][nx]     = {0};
@@ -29,8 +30,8 @@ std::complex<double> zetay[ny][nx]     = {0};
 std::complex<double> zetakx[ny][nx]    = {0};
 std::complex<double> zetaky[ny][nx]    = {0};
 std::complex<double> phikyTrue[ny][nx] = {0};
-std::complex<double> phiTot[ny][nx]    = {0};
-std::complex<double> phikTot[ny][nx]   = {0};
+std::complex<double> advTot[ny][nx]    = {0};
+std::complex<double> advkTot[ny][nx]   = {0};
 void Advance(std::complex<double> (&phi)[ny][nx]);
 
 void Initialize()
@@ -48,7 +49,7 @@ void Initialize()
                                  FFTW_BACKWARD, FFTW_MEASURE);
    zetakyFFT  = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&zetaky[0][0]),reinterpret_cast<fftw_complex*>(&zetay[0][0]),
                                  FFTW_BACKWARD, FFTW_MEASURE);
-   phiTotFFT  = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phiTot[0][0]),reinterpret_cast<fftw_complex*>(&phikTot[0][0]),
+   advTotFFT  = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&advTot[0][0]),reinterpret_cast<fftw_complex*>(&advkTot[0][0]),
                                  FFTW_FORWARD,  FFTW_MEASURE);
 
    //Initialize positional and fourier grids.
@@ -151,12 +152,12 @@ void Run()
 
       for (size_t j = 0; j < ny; ++j)
          for (size_t i = 0; i < nx; ++i)
-            rk3[j][i] = phik[j][i]+ 0.5*dt*rk2[j][i];
+            rk3[j][i] = phik[j][i] + 0.5*dt*rk2[j][i];
       Advance(rk3);
 
       for (size_t j = 0; j < ny; ++j)
          for (size_t i = 0; i < nx; ++i)
-            rk4[j][i] = phik[j][i]+ 0.5*dt*rk4[j][i];
+            rk4[j][i] = phik[j][i] + dt*rk3[j][i];
       Advance(rk4);
 
       //Put together all the RK pieces and time-advance phik.
@@ -184,7 +185,7 @@ void Run()
             {
                phit[t/saveRate][j][i]  = phi[j][i].real();
                phikt[t/saveRate][j][i] = std::abs(phik[j][i]);
-               //std::cout << phit[1][j][i] << std::endl;
+               //std::cout << std::setprecision(8) << phit[1][j][i] << std::endl;
             }
          //exit(EXIT_SUCCESS);
       }
@@ -196,7 +197,7 @@ void Run()
    fftw_destroy_plan(phikyFFT);
    fftw_destroy_plan(zetakxFFT);
    fftw_destroy_plan(zetakyFFT);
-   fftw_destroy_plan(phiTotFFT);
+   fftw_destroy_plan(advTotFFT);
    fftw_cleanup();
 
    std::cout << "Finished storing run data." << std::endl;
@@ -213,7 +214,7 @@ void Advance(std::complex<double> (&phik)[ny][nx])
          phikyTrue[j][i] = 1i*kyGrid[j]*phik[j][i]; //Need to hold on to this unaliased for eqn below.
          zetakx[j][i]    = 1i*kxGrid[i]*zetak[j][i]*kxAliased[i]*kyAliased[j];
          zetaky[j][i]    = 1i*kyGrid[j]*zetak[j][i]*kxAliased[i]*kyAliased[j];
-         phiky[j][i]     = phikyTrue[j][i]*kyAliased[j]*kxAliased[i];
+         phiky[j][i]     = phikyTrue[j][i]*kxAliased[i]*kyAliased[j];
       }
 
    fftw_execute(phikxFFT);
@@ -232,13 +233,13 @@ void Advance(std::complex<double> (&phik)[ny][nx])
 
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
-         phiTot[j][i] = phix[j][i].real()*zetay[j][i].real() - zetax[j][i].real()*phiy[j][i].real();
+         advTot[j][i] = phix[j][i].real()*zetay[j][i].real() - zetax[j][i].real()*phiy[j][i].real();
 
-   fftw_execute(phiTotFFT);
+   fftw_execute(advTotFFT);
 
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
-         phik[j][i] = kConst[j][i]*phikTot[j][i] - kappa*phikyTrue[j][i];
+         phik[j][i] = kConst[j][i]*(advkTot[j][i] - kappa*phikyTrue[j][i]);
 }
 
 } //Close namespace
