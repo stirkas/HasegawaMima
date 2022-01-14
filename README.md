@@ -17,7 +17,7 @@ sudo apt upgrade
 ## Configure and build
 
 ```console
-git@github.com:stirkas/HasegawaMima.git &&
-cd HasegawaMima/C                       &&
+git clone git@github.com:stirkas/HasegawaMima.git &&
+cd HasegawaMima/C                                 &&
 ./build.sh
 ```
