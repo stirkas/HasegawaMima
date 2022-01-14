@@ -11,8 +11,8 @@ namespace HM {
 //General parameters.
 //TODO: Don't compile if nx,ny not even...
 constexpr size_t nt = 20000;              //Num of timesteps.
-constexpr size_t nx = 8;                  //Num of x-steps.
-constexpr size_t ny = 8;                  //Num of y-steps.
+constexpr size_t nx = 256;                //Num of x-steps.
+constexpr size_t ny = 256;                //Num of y-steps.
 constexpr size_t saveRate  = 50;          //How often to save data.
 constexpr size_t numFrames = nt/saveRate; //Total number of saves.
 constexpr double lx = 2*M_PI/.15;         //Box size in x-dim.

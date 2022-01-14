@@ -172,22 +172,20 @@ void Run()
       //Renormalize inverse transforms.
       for (size_t j = 0; j < ny; ++j)
          for (size_t i = 0; i < nx; ++i)
-         {
             phi[j][i] /= std::complex<double>(nx*ny,0);
-         }
 
       //Convert and store run data. (First frame already saved above...)
       if (t%saveRate == 0 && t > 0)
       {
          std::cout << "Frame: " << t << "/" << nt << std::endl;
          for (size_t j = 0; j < ny; ++j)
+         {
             for (size_t i = 0; i < nx; ++i)
             {
                phit[t/saveRate][j][i]  = phi[j][i].real();
                phikt[t/saveRate][j][i] = std::abs(phik[j][i]);
-               //std::cout << std::setprecision(8) << phit[1][j][i] << std::endl;
             }
-         //exit(EXIT_SUCCESS);
+         }
       }
    }
 

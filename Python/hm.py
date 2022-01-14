@@ -8,10 +8,10 @@ print("Initializing variables.")
 
 #Init spatial vars.
 lx = 2*np.pi/.15
-nx = 8
+nx = 256
 dx = lx/nx
 ly = 2*np.pi/.15
-ny = 8
+ny = 256
 mx = my = 8
 dy = ly/ny
 kappa = .1
@@ -153,7 +153,7 @@ def adv(phik):
 
 #Main loop
 print("Starting main data loop.")
-for it in range(1,nt+1):
+for it in range(0,nt):
     rk1 = adv(phik)
     rk2 = adv(phik + 0.5*dt*rk1)
     rk3 = adv(phik + 0.5*dt*rk2)
@@ -164,12 +164,11 @@ for it in range(1,nt+1):
     phik = phik + dt*rk #RK4 advance.
     
     #Store plots as specified.
-    if ((it%(saveRate))==0):
+    if ((it%(saveRate))==0 and it > 0):
         print("Storing frame data: " + str(it) + "/" + str(nt) + ".")
         phit[(it//saveRate),:,:]  = np.real(np.fft.ifft2(phik))
         phikt[(it//saveRate),:,:] = np.abs(np.fft.fftshift(phik))
-        #print(phit[1][:][:])
-        #exit()
+
 print("Finished storing run data.")
 
 def update_anim(it):
