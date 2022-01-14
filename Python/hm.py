@@ -144,8 +144,8 @@ def adv(phik):
     #Define derivs for main equation.
     phikx  = 1j*KX*phik;    phix = np.real(np.fft.ifft2(phikx*KXD*KYD))
     phiky  = 1j*KY*phik;    phiy = np.real(np.fft.ifft2(phiky*KXD*KYD))
-    zetakx = 1j*KX*zetak; zetax = np.real(np.fft.ifft2(zetakx*KXD*KYD))
-    zetaky = 1j*KY*zetak; zetay = np.real(np.fft.ifft2(zetaky*KXD*KYD))
+    zetakx = 1j*KX*zetak;  zetax = np.real(np.fft.ifft2(zetakx*KXD*KYD))
+    zetaky = 1j*KY*zetak;  zetay = np.real(np.fft.ifft2(zetaky*KXD*KYD))
 
     derivative = kconst*(np.fft.fft2(phix*zetay-zetax*phiy) - kappa*phiky)
     
@@ -166,8 +166,10 @@ for it in range(1,nt+1):
     #Store plots as specified.
     if ((it%(saveRate))==0):
         print("Storing frame data: " + str(it) + "/" + str(nt) + ".")
-        phit[(it//saveRate)-1,:,:]  = np.real(np.fft.ifft2(phik))
-        phikt[(it//saveRate)-1,:,:] = np.abs(np.fft.fftshift(phik))
+        phit[(it//saveRate),:,:]  = np.real(np.fft.ifft2(phik))
+        phikt[(it//saveRate),:,:] = np.abs(np.fft.fftshift(phik))
+        #print(phit[1][:][:])
+        #exit()
 print("Finished storing run data.")
 
 def update_anim(it):
