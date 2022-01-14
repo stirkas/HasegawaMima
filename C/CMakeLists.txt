@@ -18,4 +18,4 @@ endif()
 #include(${CMAKE_CURRENT_LIST_DIR}/BLAS_LAPACK_funcs.cmake)
 #Load_BLAS_LAPACK()
 
-add_subdirectory(HM_C)
+add_subdirectory(HM)
