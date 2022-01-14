@@ -177,7 +177,7 @@ void Run()
       //Renormalize inverse transforms.
       for (size_t j = 0; j < ny; ++j)
          for (size_t i = 0; i < nx; ++i)
-            phi[j][i] /= std::complex<double>(nx*ny,0);
+            phi[j][i] /= static_cast<double>(nx*ny);
 
       //Convert and store run data. (First frame already saved above...)
       if (t%saveRate == 0 && t > 0)
@@ -228,10 +228,10 @@ void Advance(std::complex<double> (&phik)[ny][nx])
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
       {
-         phix[j][i]  /= std::complex<double>(nx*ny,0);
-         phiy[j][i]  /= std::complex<double>(nx*ny,0);
-         zetax[j][i] /= std::complex<double>(nx*ny,0);
-         zetay[j][i] /= std::complex<double>(nx*ny,0);
+         phix[j][i]  /= static_cast<double>(nx*ny);
+         phiy[j][i]  /= static_cast<double>(nx*ny);
+         zetax[j][i] /= static_cast<double>(nx*ny);
+         zetay[j][i] /= static_cast<double>(nx*ny);
       }
 
    for (size_t j = 0; j < ny; ++j)
