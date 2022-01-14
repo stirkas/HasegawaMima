@@ -57,13 +57,15 @@ void Initialize()
    //Initialize positional and fourier grids.
    for (size_t i = 0; i < nx; ++i)
    {
-      xGrid[i]  = i*dx;
-      kxGrid[i] = -M_PI*nx/lx + 2*M_PI*i/lx;
+      xGrid[i]    = i*dx;
+      kxGrid[i]   = -M_PI*nx/lx + 2*M_PI*i/lx;
+      kxSqGrid[i] = kxGrid[i]*kxGrid[i];
    }
    for (size_t j = 0; j < ny; ++j)
    {
-      yGrid[j]  = j*dy;
-      kyGrid[j] = -M_PI*ny/ly + 2*M_PI*j/ly;
+      yGrid[j]    = j*dy;
+      kyGrid[j]   = -M_PI*ny/ly + 2*M_PI*j/ly;
+      kySqGrid[j] = kyGrid[j]*kyGrid[j];
    }
 
    //Shift kx and ky to how fftw will index phik data.
