@@ -20,6 +20,8 @@ fftw_plan phikyFFT;
 fftw_plan zetakxFFT;
 fftw_plan zetakyFFT;
 fftw_plan advTotFFT;
+double kxSqGrid[nx] = {0};
+double kySqGrid[ny] = {0};
 std::complex<double> phix[ny][nx]      = {0};
 std::complex<double> phiy[ny][nx]      = {0};
 std::complex<double> phikx[ny][nx]     = {0};
@@ -80,7 +82,7 @@ void Initialize()
    //Calculate kconst needed for HM algorithm. kConst = 1/(1 + kx**2 + ky**2).
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
-         kConst[j][i] = 1/(1 + kxGrid[i]*kxGrid[i] + kyGrid[j]*kyGrid[j]);
+         kConst[j][i] = 1/(1 + kxSqGrid[i] + kySqGrid[j]);
 
    //Set up ICs.
    //Random strong mode + random weaker modes + random phase shifts in each.
@@ -97,13 +99,14 @@ void Initialize()
       for (size_t i = 0; i < nx; ++i)
          for (size_t m2 = 0; m2 < my; ++m2)
             for (size_t m1 = 0; m1 < mx; ++m1)
-               phi[j][i] = phi[j][i]+A[m2][m1]*exp(1i*kxGrid[m1]*xGrid[i]+1i*kyGrid[m2]*yGrid[j]);
+               phi[j][i] = phi[j][i] + A[m2][m1]*exp(1i*kxGrid[m1]*xGrid[i]+1i*kyGrid[m2]*yGrid[j]);
 
-   //Transpose phi and take real part - so also do diagonals...
+   //Transpose phi and reset phi to real part - so also do diagonals...
+   //TODO: Do all these arrays really need to be kept real until final storage???
    double temp = 0;
    for (size_t j = 0; j < ny; ++j)
    {
-      for (size_t i = 0; i <= j; ++i)
+      for (size_t i = 0; i < j; ++i)
       {
          temp      = phi[j][i].real();
          phi[j][i] = phi[i][j].real();
@@ -206,7 +209,7 @@ void Advance(std::complex<double> (&phik)[ny][nx])
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
       {
-         zetak[j][i]     = -(kxGrid[i]*kxGrid[i] + kyGrid[j]*kyGrid[j])*phik[j][i];
+         zetak[j][i]     = -(kxSqGrid[i] + kySqGrid[j])*phik[j][i];
 
          phikx[j][i]     = 1i*kxGrid[i]*phik[j][i]*kxAliased[i]*kyAliased[j];
          phikyTrue[j][i] = 1i*kyGrid[j]*phik[j][i]; //Need to hold on to this unaliased for eqn below.
