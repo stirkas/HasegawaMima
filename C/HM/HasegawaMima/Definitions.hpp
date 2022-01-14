@@ -41,7 +41,7 @@ std::array<double, nx> kxAliased = {0};
 std::array<double, ny> kyAliased = {0};
 
 double kConst[ny][nx]             = {0};
-std::complex<double> phi[ny][nx]  = {0}; //Keep phi real throughout, but FFTW doesn't work w/ same size arrays when using r2c or c2r...
+std::complex<double> phi[ny][nx]  = {0};
 std::complex<double> phik[ny][nx] = {0};
 
 std::array<std::complex<double>[ny][nx], numFrames> phit  = {0};
