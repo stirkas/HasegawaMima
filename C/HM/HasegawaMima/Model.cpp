@@ -177,7 +177,7 @@ void Run()
       //Renormalize inverse transforms.
       for (size_t j = 0; j < ny; ++j)
          for (size_t i = 0; i < nx; ++i)
-            phi[j][i] /= static_cast<double>(nx*ny);
+            phi[j][i] /= static_cast<double>(nx*ny); //TODO: https://stackoverflow.com/questions/22184403/how-to-cast-the-size-t-to-double-or-int-c
 
       //Convert and store run data. (First frame already saved above...)
       if (t%saveRate == 0 && t > 0)
