@@ -1,14 +1,11 @@
 {
-	"folders": [
+   "folders": [
       {
          "path": "./"
       }
    ],
-	"settings": {
+   "settings": {
       "cmake.sourceDirectory": "${workspaceFolder}/C",
-      "cmake.buildDirectory": "${workspaceFolder}/C/build",
-      "files.associations": {
-         "complex": "cpp"
-      }
-	}
+      "cmake.buildDirectory": "${workspaceFolder}/C/build"
+   }
 }

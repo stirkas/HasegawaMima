@@ -15,7 +15,4 @@ if(NOT Boost_FOUND)
    message(ERROR "Could not find Boost.")
 endif()
 
-#include(${CMAKE_CURRENT_LIST_DIR}/BLAS_LAPACK_funcs.cmake)
-#Load_BLAS_LAPACK()
-
 add_subdirectory(HM)
