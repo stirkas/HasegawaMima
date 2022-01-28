@@ -263,10 +263,10 @@ void Advance(Arrc2d& phik)
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
       {
-         phix[j][i]  /= static_cast<double>(nx*ny);
-         phiy[j][i]  /= static_cast<double>(nx*ny);
-         zetax[j][i] /= static_cast<double>(nx*ny);
-         zetay[j][i] /= static_cast<double>(nx*ny);
+         phix[j][i]  /= static_cast<unsigned int>(nx*ny);
+         phiy[j][i]  /= static_cast<unsigned int>(nx*ny);
+         zetax[j][i] /= static_cast<unsigned int>(nx*ny);
+         zetay[j][i] /= static_cast<unsigned int>(nx*ny);
       }
 
    for (size_t j = 0; j < ny; ++j)
