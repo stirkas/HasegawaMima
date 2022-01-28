@@ -9,42 +9,54 @@
 namespace HM {
 
 //General parameters.
-//TODO: Don't compile if nx,ny not even...
-constexpr size_t nt = 20000;              //Num of timesteps.
-constexpr size_t nx = 256;                //Num of x-steps.
-constexpr size_t ny = 256;                //Num of y-steps.
-constexpr size_t saveRate  = 50;          //How often to save data.
-constexpr size_t numFrames = nt/saveRate; //Total number of saves.
-constexpr double lx = 2*M_PI/.15;         //Box size in x-dim.
-constexpr double ly = 2*M_PI/.15;         //Box size in y-dim.
-constexpr double dx = lx/nx;              //Stepsize in x-dim.
-constexpr double dy = ly/ny;              //Stepsize in y-dim.
-constexpr double dt = 2e-1;               //Size of timestep.
+size_t nt = 20000;              //Num of timesteps.
+size_t nx = 256;                //Num of x-steps.
+size_t ny = 256;                //Num of y-steps.
+size_t saveRate  = 50;          //How often to save data.
+size_t numFrames = nt/saveRate; //Total number of saves.
+double lx = 2*M_PI/.15;         //Box size in x-dim.
+double ly = 2*M_PI/.15;         //Box size in y-dim.
+double dx = lx/nx;              //Stepsize in x-dim.
+double dy = ly/ny;              //Stepsize in y-dim.
+double dt = 2e-1;               //Size of timestep.
 
 //Params specific to model (Haotian's ETG).
-constexpr double tau      = 0;   //(T_e/T_i)
-constexpr double eta      = 0;   //(r_n/r_T) - where (grad_x(A_e)/A_e) = -1/r_A
-constexpr double mRat     = 0;   //(m_e/m_i)
-constexpr double kappa    = 0.1; //HasegawaMima eq. const.
-constexpr double rnByRhoI = 0;   //(r_n/rho_i)
+double tau      = 0;   //(T_e/T_i)
+double eta      = 0;   //(r_n/r_T) - where (grad_x(A_e)/A_e) = -1/r_A
+double mRat     = 0;   //(m_e/m_i)
+double kappa    = 0.1; //HasegawaMima eq. const.
+double rnByRhoI = 0;   //(r_n/rho_i)
 
 //Extra flags.
-constexpr bool loadGENE = false; //Possibility for loading data from GENE ASCII output.
+bool loadGENE = false; //Possibility for loading data from GENE ASCII output.
 
 
 //Arrays
-std::array<double, nx> xGrid     = {0}; //Ranges from [0, (nx-1)*dx] w/ nx vals.
-std::array<double, ny> yGrid     = {0};
-std::array<double, nx> kxGrid    = {0}; //Ranges from [-pi*nx/lx, pi*nx/lx) w/ nx vals.
-std::array<double, ny> kyGrid    = {0};
-std::array<double, nx> kxAliased = {0};
-std::array<double, ny> kyAliased = {0};
+typedef boost::multi_array<double, 1> Arr1d;
+typedef Arr1d::extent_gen extents1d;
+Arr1d xGrid;
+Arr1d yGrid;
+Arr1d kxGrid;
+Arr1d kyGrid;
+Arr1d kxAliased;
+Arr1d kyAliased;
+extents1d ext1d;
 
-double kConst[ny][nx]             = {0};
-std::complex<double> phi[ny][nx]  = {0};
-std::complex<double> phik[ny][nx] = {0};
+typedef boost::multi_array<double, 2> Arr2d;
+typedef Arr2d::extent_gen extents2d;
+Arr2d kConst;
+extents2d ext2d;
 
-std::array<std::complex<double>[ny][nx], numFrames> phit  = {0};
-std::array<std::complex<double>[ny][nx], numFrames> phikt = {0};
+typedef boost::multi_array<std::complex<double>, 2> Arrc2d;
+typedef Arrc2d::extent_gen extentsc2d;
+Arrc2d phi;
+Arrc2d phik;
+extentsc2d extc2d;
+
+typedef boost::multi_array<double, 3> Arr3d;
+typedef Arr3d::extent_gen extents3d;
+Arr3d phit;
+Arr3d phikt;
+extents3d extc3d;
 
 } //Close namespace.

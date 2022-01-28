@@ -20,24 +20,54 @@ fftw_plan phikyFFT;
 fftw_plan zetakxFFT;
 fftw_plan zetakyFFT;
 fftw_plan advTotFFT;
-double kxSqGrid[nx] = {0};
-double kySqGrid[ny] = {0};
-std::complex<double> phix[ny][nx]      = {0};
-std::complex<double> phiy[ny][nx]      = {0};
-std::complex<double> phikx[ny][nx]     = {0};
-std::complex<double> phiky[ny][nx]     = {0};
-std::complex<double> zetak[ny][nx]     = {0};
-std::complex<double> zetax[ny][nx]     = {0};
-std::complex<double> zetay[ny][nx]     = {0};
-std::complex<double> zetakx[ny][nx]    = {0};
-std::complex<double> zetaky[ny][nx]    = {0};
-std::complex<double> phikyTrue[ny][nx] = {0};
-std::complex<double> advTot[ny][nx]    = {0};
-std::complex<double> advkTot[ny][nx]   = {0};
-void Advance(std::complex<double> (&phi)[ny][nx]);
+Arr1d kxSqGrid;
+Arr1d kySqGrid;
+Arrc2d phix;
+Arrc2d phiy;
+Arrc2d phikx;
+Arrc2d phiky;
+Arrc2d zetak;
+Arrc2d zetax;
+Arrc2d zetay;
+Arrc2d zetakx;
+Arrc2d zetaky;
+Arrc2d phikyTrue;
+Arrc2d advTot;
+Arrc2d advkTot;
+void Advance(Arrc2d& phi);
 
 void Initialize()
 {
+   //Initialize arrays.
+   xGrid.resize(ext1d[nx]); //Ranges from [0, (nx-1)*dx] w/ nx vals.
+   yGrid.resize(ext1d[ny]);
+   kxGrid.resize(ext1d[nx]); //Ranges from [-pi*nx/lx, pi*nx/lx) w/ nx vals.
+   kyGrid.resize(ext1d[ny]);
+   kxAliased.resize(ext1d[nx]);
+   kyAliased.resize(ext1d[ny]);
+
+   kConst.resize(ext2d[ny][nx]);
+   phi.resize(extc2d[ny][nx]);
+   phik.resize(extc2d[ny][nx]);
+
+   phit.resize(extc3d[numFrames][ny][nx]);
+   phikt.resize(extc3d[numFrames][ny][nx]);
+
+   kxSqGrid.resize(ext1d[nx]);
+   kySqGrid.resize(ext1d[ny]);
+   phix.resize(extc2d[ny][nx]);
+   phiy.resize(extc2d[ny][nx]);
+   phikx.resize(extc2d[ny][nx]);
+   phiky.resize(extc2d[ny][nx]);
+   zetak.resize(extc2d[ny][nx]);
+   zetax.resize(extc2d[ny][nx]);
+   zetay.resize(extc2d[ny][nx]);
+   zetakx.resize(extc2d[ny][nx]);
+   zetaky.resize(extc2d[ny][nx]);
+   phikyTrue.resize(extc2d[ny][nx]);
+   advTot.resize(extc2d[ny][nx]);
+   advkTot.resize(extc2d[ny][nx]);
+
    //Generate FFT plans now because speedy FFTW_MEASURE option involves clearing data...
    phiForeFFT = fftw_plan_dft_2d(nx, ny, reinterpret_cast<fftw_complex*>(&phi[0][0]),   reinterpret_cast<fftw_complex*>(&phik[0][0]),
                                  FFTW_FORWARD,  FFTW_MEASURE);
@@ -74,8 +104,8 @@ void Initialize()
 
    //Load up aliasing vectors. They remove highest 1/3 of k-modes (on each side) to keep nonlinear vals in our k-range (2/3 rule)
    //Store in nonshifted mode to use for calculations.
-   kxAliased.fill(1);
-   kyAliased.fill(1);
+   std::fill(kxAliased.data(), kxAliased.data() + kxAliased.num_elements(), 1);
+   std::fill(kyAliased.data(), kyAliased.data() + kyAliased.num_elements(), 1);
    for (size_t i = ceil(nx/3); i < 2*floor(nx/3) + nx%3; ++i)
       kxAliased[i] = 0;
    for (size_t j = ceil(ny/3); j < 2*floor(ny/3) + ny%3; ++j)
@@ -136,11 +166,16 @@ void Run()
 
    //Set up necessary arrays once for all looping.
    //Runge-Kutta pieces.
-   std::complex<double> rk[ny][nx]  = {0};
-   std::complex<double> rk1[ny][nx] = {0};
-   std::complex<double> rk2[ny][nx] = {0};
-   std::complex<double> rk3[ny][nx] = {0};
-   std::complex<double> rk4[ny][nx] = {0};
+   Arrc2d rk;
+   Arrc2d rk1;
+   Arrc2d rk2;
+   Arrc2d rk3;
+   Arrc2d rk4;
+   rk.resize(extc2d[ny][nx]);
+   rk1.resize(extc2d[ny][nx]);
+   rk2.resize(extc2d[ny][nx]);
+   rk3.resize(extc2d[ny][nx]);
+   rk4.resize(extc2d[ny][nx]);
 
    for (size_t t = 0; t < nt; ++t)
    {
@@ -177,7 +212,7 @@ void Run()
       //Renormalize inverse transforms.
       for (size_t j = 0; j < ny; ++j)
          for (size_t i = 0; i < nx; ++i)
-            phi[j][i] /= static_cast<double>(nx*ny); //TODO: https://stackoverflow.com/questions/22184403/how-to-cast-the-size-t-to-double-or-int-c
+            phi[j][i] /= static_cast<unsigned int>(nx*ny);
 
       //Convert and store run data. (First frame already saved above...)
       if (t%saveRate == 0 && t > 0)
@@ -206,7 +241,7 @@ void Run()
    std::cout << "Finished storing run data." << std::endl;
 }
 
-void Advance(std::complex<double> (&phik)[ny][nx])
+void Advance(Arrc2d& phik)
 {
    for (size_t j = 0; j < ny; ++j)
       for (size_t i = 0; i < nx; ++i)
