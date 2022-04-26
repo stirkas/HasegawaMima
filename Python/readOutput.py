@@ -4,10 +4,10 @@ import matplotlib.animation as animation
 
 initialCase = 3
 save = False
-phit = np.load('./HasegawaMima/Python/hmETG_' + str(initialCase) + '.npz')['arr_0']
-phikt = np.load('./HasegawaMima/Python/hmETG_' + str(initialCase) + '_k.npz')['arr_0']
+phit  = np.load('hmETG_' + str(initialCase) + '.npz')['arr_0']
+phikt = np.load('hmETG_' + str(initialCase) + '_k.npz')['arr_0']
 
-frame = 1090
+frame = 1999
 
 plotSize = 40
 nx = ny = 256
@@ -30,10 +30,20 @@ kx = np.fft.ifftshift(kx)
 ky = np.fft.ifftshift(ky)
 KX,KY = np.meshgrid(kx,ky)
 
+phiAvg  = np.zeros((nx,ny), dtype=float)
+phikAvg = np.zeros((nx,ny), dtype=float)
+print(np.shape(phiAvg))
+print(np.shape(phit[0,:,:]))
+for i in range(745,np.shape(phit)[0]):
+    phiAvg  += phit[i,:,:]
+    phikAvg += phikt[i,:,:]
+phiAvg /= (np.shape(phit)[0]-745)
+phikAvg /= (np.shape(phit)[0]-745)
+
 fig = plt.figure(num=None, figsize=(12,6), dpi=100)
 padding   = 20
-bigText   = 30
-smallText = 18
+bigText   = 18
+smallText = 12
 plt.rcParams.update({'font.size': bigText})
 
 fig.clf()   
@@ -41,8 +51,9 @@ ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
 ax1.clear()
 ax2.clear()
-im1 = ax1.contourf(X,Y, phit[frame,:,:]) #, 20, cmap='jet')
-im2 = ax2.contourf(np.fft.fftshift(KX), np.fft.fftshift(KY), phikt[frame,:,:]) #, 20, cmap='jet')
+#im1 = ax1.contourf(X,Y, phit[frame,:,:]) #, 20, cmap='jet')
+im1 = ax1.contourf(X,Y, phiAvg) #, 20, cmap='jet')
+im2 = ax2.contourf(np.fft.fftshift(KX), np.fft.fftshift(KY), phikAvg) #, 20, cmap='jet')
 ax1.grid()
 ax2.grid()
 ax1.set_title("$\\phi$",   pad=padding)
@@ -62,6 +73,6 @@ fig.colorbar(im2, ax=ax2)
 plt.tight_layout()
 
 if (save):
-   plt.savefig('./HasegawaMima/hmPhiETG_' + str(initialCase) + '.pdf')
+   plt.savefig('hmPhiETG_' + str(initialCase) + '.pdf')
 else:
    plt.show()

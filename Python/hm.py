@@ -17,7 +17,7 @@ dy = ly/ny
 kappa = .1
 
 #Init temporal grid.
-nt = 20000
+nt = 100000
 dt = 2e-1 #May change below in cases as necessary.
 
 #Create initial grids.
@@ -44,7 +44,8 @@ phi = np.zeros((nx,ny))
 plotRatio = 1
 waveFreq = 1
 initialCase = 3
-showPlot = True
+showPlot = False
+saveData = True
 saveAnim = False
 currentlySaving = False #Turn on once files are being saved.
 caseString = "Unspecified"
@@ -214,8 +215,13 @@ anim=animation.FuncAnimation(fig,update_anim,frames=numFrames,repeat=False)
 if (showPlot):
     plt.show()
 
-if (saveAnim):
-    print("Saving animation. This will probably take a few minutes...")
-    currentlySaving = True
-    anim.save('HasegawaMima/hm_' + str(initialCase) + '.mp4', writer=writer)
-sys.exit("Animation complete.")
+if (saveData):
+    print('Saving data array.')
+    np.savez_compressed('hmITG_' + str(initialCase) + '.npz', phit)
+    np.savez_compressed('hmITG_' + str(initialCase) + '_k.npz', phikt)
+
+#if (saveAnim):
+#    print("Saving animation. This will probably take a few minutes...")
+#    currentlySaving = True
+#    anim.save('HasegawaMima/hm_' + str(initialCase) + '.mp4', writer=writer)
+#sys.exit("Animation complete.")
